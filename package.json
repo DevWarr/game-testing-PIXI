@@ -1,0 +1,23 @@
+{
+  "name": "game-testing-PIXI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevWarr/game-testing-PIXI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevWarr/game-testing-PIXI/issues"
+  },
+  "homepage": "https://github.com/DevWarr/game-testing-PIXI#readme",
+  "dependencies": {
+    "pixi.js": "^6.2.1"
+  }
+}
