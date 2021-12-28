@@ -1,10 +1,11 @@
 {
-  "name": "game-testing-PIXI",
+  "name": "game-testing-pixi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-module": "sh ./build-scripts/build-module.sh"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,9 @@
   "homepage": "https://github.com/DevWarr/game-testing-PIXI#readme",
   "dependencies": {
     "pixi.js": "^6.2.1"
+  },
+  "devDependencies": {
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
   }
 }
