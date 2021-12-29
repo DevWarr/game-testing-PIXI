@@ -2,4 +2,7 @@
     "include": [
         "./src/**/*.ts"
     ],
+    "compilerOptions": {
+        "target": "ES5"
+    }
 }
