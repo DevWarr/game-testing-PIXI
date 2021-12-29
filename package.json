@@ -4,8 +4,11 @@
   "description": "",
   "private": true,
   "scripts": {
+    "lint": "./node_modules/.bin/eslint ./src",
+    "lint:fix": "./node_modules/.bin/eslint ./src --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-module": "sh ./build-scripts/build-module.sh"
+    "build-module": "sh ./shell-scripts/build-module.sh",
+    "new-module": "sh ./shell-scripts/new-module.sh"
   },
   "repository": {
     "type": "git",
@@ -22,6 +25,12 @@
     "pixi.js": "^6.2.1"
   },
   "devDependencies": {
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "html-webpack-plugin": "^5.5.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   }
