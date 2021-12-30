@@ -37,6 +37,10 @@ export class Application {
         this.ground = this.buildGround();
         this.ground.y = Math.round(APP_CONFIGURATION.height * 0.7);
         this.app.stage.addChild(this.ground);
+
+        this.controllerButton.textDisplay.x = 4
+        this.controllerButton.textDisplay.y = APP_CONFIGURATION.height - 50
+        this.app.stage.addChild(this.controllerButton.textDisplay)
         
         this.player = new Fighter(this, this.ground);
         this.player.setFighterPosition(100, -200)
@@ -66,6 +70,7 @@ export class Application {
             this.state.registerButtonPress()
         }
 
+        this.controllerButton.update(this.app.ticker.deltaMS)
         this.timer.update(frameDelta, this.app.ticker.deltaMS);
         this.state.update(frameDelta, this.app.ticker.deltaMS)
         this.player.update(frameDelta, this.app.ticker.deltaMS);
@@ -76,6 +81,8 @@ export class Application {
      * Transitions out from the current state and into the given state.
      */
     transitionState = (newState: AbstractStateClass) => {
+        if (this.state.constructor === newState.constructor) return
+
         this.state.exitState()
         this.state = newState
         this.state.enterState()

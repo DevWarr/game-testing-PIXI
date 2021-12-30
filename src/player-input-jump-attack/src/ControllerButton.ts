@@ -1,3 +1,4 @@
+import { Text as PIXIText } from "pixi.js"
 
 /**
  * A Single-Button Controller.
@@ -5,6 +6,9 @@
  * Determines whether the given button is pressed.
  */
 export class ControllerButton {
+    public textDisplay: PIXIText
+    private elapsedTime: number
+
     readonly key: string;
     private _isHeld: boolean = false;
     get isHeld(): boolean {
@@ -17,6 +21,12 @@ export class ControllerButton {
     
     constructor(key: string) {
         this.key = key
+        this.textDisplay = new PIXIText("", {
+            fontFamily: "Arial",
+            fontSize: 48,
+            fill: 0x9988FF,
+            align: "left"
+        })
         this.initialize()
     }
 
@@ -26,14 +36,13 @@ export class ControllerButton {
     private initialize = () => {
         window.onkeydown = (event: KeyboardEvent) => {
             if (event.key === this.key && !this._isHeld) {
-                console.log("pressed")
+                this.textDisplay.text = "Button pressed!"
                 this._isPressed = true;
                 this._isHeld = true;
             }
         }
         window.onkeyup = (event: KeyboardEvent) => {
             if (event.key === this.key) {
-                console.log("released")
                 this._isPressed = false;
                 this._isHeld = false;
             }
@@ -41,7 +50,6 @@ export class ControllerButton {
         // When the window loses focus, we stop pressing the button.
         // Allows us to avoid pesky scenarios where the button glitches and stays held.
         window.onblur = () => {
-            console.log("released")
             this._isPressed = false;
             this._isHeld = false;
         }
@@ -55,5 +63,16 @@ export class ControllerButton {
      */
     registerButtonPress = () => {
         this._isPressed = false;
+    }
+
+    update = (msDelta: number) => {
+        if (this.textDisplay.text.length === 0) {
+            this.elapsedTime = 0
+            return
+        }
+        this.elapsedTime += msDelta
+        if (this.elapsedTime > 2000) {
+            this.textDisplay.text = ""
+        }
     }
 }
