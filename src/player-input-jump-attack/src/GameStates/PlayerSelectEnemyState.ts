@@ -2,6 +2,7 @@ import {
     Graphics as PIXIGraphics,
     Point as PIXIPoint
 } from "pixi.js"
+import { ButtonTypes } from "../Controller";
 import { AbstractStateClass } from "./AbstractStateClass";
 import { PlayerAttackingState } from "./PlayerAttackingState";
 
@@ -29,16 +30,16 @@ export class PlayerSelectEnemyState extends AbstractStateClass {
         )
         this.enemySelectArrow.y = this.application.enemy.fighter.y - 20
         this.application.app.stage.addChild(this.enemySelectArrow)
+
+        this.application.controller.updateButtonFunctions(ButtonTypes.ACTION_BUTTON, this.onEnemySelect, null)
     }
 
     exitState = (): void => {
-        this.application.controllerButton.registerButtonPress()
         this.application.app.stage.removeChild(this.enemySelectArrow)
         this.enemySelectArrow.destroy()
     }
 
-    registerButtonPress = (): void => {
-        this.application.controllerButton.registerButtonPress()
+    onEnemySelect = (): void => {
         this.application.transitionState(new PlayerAttackingState(this.application))
     }
 

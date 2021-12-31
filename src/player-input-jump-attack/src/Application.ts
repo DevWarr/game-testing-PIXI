@@ -4,7 +4,7 @@ import {
 } from "pixi.js";
 import { GameTimer } from "./GameTimer";
 import { Fighter } from "./Fighter";
-import { ControllerButton } from "./ControllerButton";
+import { Controller } from "./Controller";
 import { AbstractStateClass, GameStartingState, PlayerSelectActionState } from "./GameStates";
 
 const APP_CONFIGURATION = {
@@ -21,7 +21,7 @@ const APP_CONFIGURATION = {
 export class Application {
     public app: PIXIApplication = new PIXIApplication(APP_CONFIGURATION);
     public view: HTMLCanvasElement = this.app.view;
-    public controllerButton: ControllerButton = new ControllerButton("x");
+    public controller: Controller = new Controller();
     
     public timer: GameTimer = new GameTimer();
 
@@ -38,10 +38,6 @@ export class Application {
         this.ground.y = Math.round(APP_CONFIGURATION.height * 0.7);
         this.app.stage.addChild(this.ground);
 
-        this.controllerButton.textDisplay.x = 4
-        this.controllerButton.textDisplay.y = APP_CONFIGURATION.height - 50
-        this.app.stage.addChild(this.controllerButton.textDisplay)
-        
         this.player = new Fighter(this, this.ground);
         this.player.setFighterPosition(100, -200)
         this.app.stage.addChild(this.player.fighter);
@@ -66,11 +62,8 @@ export class Application {
         ) {
             this.transitionState(new PlayerSelectActionState(this))
         }
-        if (this.controllerButton.isPressed) {
-            this.state.registerButtonPress()
-        }
 
-        this.controllerButton.update(this.app.ticker.deltaMS)
+        this.controller.update(this.app.ticker.deltaMS)
         this.timer.update(frameDelta, this.app.ticker.deltaMS);
         this.state.update(frameDelta, this.app.ticker.deltaMS)
         this.player.update(frameDelta, this.app.ticker.deltaMS);

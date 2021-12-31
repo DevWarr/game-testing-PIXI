@@ -24,13 +24,7 @@ export class PlayerAttackCompleteState extends AbstractStateClass {
     }
 
     exitState = (): void => {
-        this.application.controllerButton.registerButtonPress()
         this.application.app.stage.removeChild(this.textDisplay)
         this.textDisplay.destroy()
     }
-
-    registerButtonPress = (): void => {
-        this.application.controllerButton.registerButtonPress()
-    }
-    
 }

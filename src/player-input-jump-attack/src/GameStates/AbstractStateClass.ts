@@ -11,7 +11,5 @@ export abstract class AbstractStateClass {
 
     abstract exitState(): void
 
-    abstract registerButtonPress(): void
-
     update = (frameDelta: number, msDelta: number) => {}
 }

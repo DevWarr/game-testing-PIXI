@@ -1,3 +1,4 @@
+import { ButtonTypes } from "../Controller";
 import { AttackStates } from "../Fighter";
 import { AbstractStateClass } from "./AbstractStateClass";
 
@@ -5,16 +6,9 @@ export class PlayerAttackingState extends AbstractStateClass {
     
     enterState = (): void => {
         this.application.player.attack(this.application.enemy)
+        this.application.controller.updateButtonFunctions(ButtonTypes.ACTION_BUTTON, this.application.player.inputJump, null)
     }
 
-    exitState = (): void => {
-        this.application.controllerButton.registerButtonPress()
-    }
-
-    registerButtonPress = (): void => {
-        this.application.controllerButton.registerButtonPress()
-        if (this.application.player.attackState !== AttackStates.JUMPING) return
-        this.application.player.inputJump()
-    }
+    exitState = (): void => {}
 
 }
