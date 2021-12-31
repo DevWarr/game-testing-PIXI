@@ -138,59 +138,7 @@ export class Fighter {
         // move along the X
         this.fighter.x += this.velocity.x
 
-        if (this._attackState === AttackStates.MOVING_TO_ATTACK) {
-            if (this.isWithinDistanceOf(this.fighterToAttack)) {
-                this._attackState = AttackStates.JUMPING
-                this.velocity.y = -10
-            }     
-        }
-
-        if (this._attackState === AttackStates.JUMPING) {
-            if (this.isCollidingWith(this.fighterToAttack)) {
-                this.fighter.x = this.fighterToAttack.fighter.x
-                this.application.transitionState(new PlayerAttackCompleteState(this.application, false))
-                this._attackState = AttackStates.RETURN_TO_INITIAL
-                this.velocity.y = -5
-                if (this.fighter.x > this.initialXPosition) {
-                    this.velocity.x = -5
-                } else {
-                    this.velocity.x = 5
-                }
-            }
-        }
-
-        if (this._attackState === AttackStates.DOUBLE_JUMP) {
-            if (this.isCollidingWith(this.fighterToAttack)) {
-                this.fighter.x = this.fighterToAttack.fighter.x
-                this._attackState = AttackStates.RETURN_TO_INITIAL
-                this.velocity.y = -5
-                if (this.fighter.x > this.initialXPosition) {
-                    this.velocity.x = -5
-                } else {
-                    this.velocity.x = 5
-                }
-            }
-        }
-
-        if (this._attackState === AttackStates.RETURN_TO_INITIAL) {
-            if (this.velocity.x > 0) {
-                if (this.fighter.x >= this.initialXPosition) {
-                    this.velocity.x = 0
-                    this.fighter.x = this.initialXPosition
-                    this._attackState = AttackStates.NOT_ATTACKING
-                    this.fighterToAttack = null
-                    this.application.transitionState(new PlayerSelectActionState(this.application))
-                }
-            } else {
-                if (this.fighter.x <= this.initialXPosition) {
-                    this.velocity.x = 0
-                    this.fighter.x = this.initialXPosition
-                    this._attackState = AttackStates.NOT_ATTACKING
-                    this.fighterToAttack = null
-                    this.application.transitionState(new PlayerSelectActionState(this.application))
-                }
-            }
-        }
+        if (this._attackState !== AttackStates.NOT_ATTACKING) this.attack()
     };
 
     /**
@@ -214,6 +162,88 @@ export class Fighter {
             this.fighter.y += this.velocity.y;
         }
     };
+    
+    startAttack = (fighterToAttack: Fighter) => {
+        this.fighterToAttack = fighterToAttack
+        this._attackState = AttackStates.MOVING_TO_ATTACK
+    }
+
+    private attack = () => {
+        if (this._attackState === AttackStates.MOVING_TO_ATTACK) {
+            // advance toward the enemy, whether it be to the left or right
+            if (this.fighter.x < this.fighterToAttack.fighter.x) {
+                this.velocity.x = 5
+            } else this.velocity.x = -5
+
+            if (this.isWithinDistanceOf(this.fighterToAttack)) {
+                this.velocity.y = -10
+                this._attackState = AttackStates.JUMPING
+            }     
+        }
+
+        if (this._attackState === AttackStates.JUMPING) {
+            if (this.isCollidingWith(this.fighterToAttack)) {
+                this.fighter.x = this.fighterToAttack.fighter.x
+
+                this.velocity.y = -5
+                if (this.fighter.x > this.initialXPosition) {
+                    this.velocity.x = -5
+                } else {
+                    this.velocity.x = 5
+                }
+
+                this._attackState = AttackStates.RETURN_TO_INITIAL
+                this.application.transitionState(new PlayerAttackCompleteState(this.application, false))
+            }
+        }
+
+        if (this._attackState === AttackStates.DOUBLE_JUMP) {
+            if (this.isCollidingWith(this.fighterToAttack)) {
+                this.fighter.x = this.fighterToAttack.fighter.x
+
+                this.velocity.y = -5
+                if (this.fighter.x > this.initialXPosition) {
+                    this.velocity.x = -5
+                } else {
+                    this.velocity.x = 5
+                }
+
+                this._attackState = AttackStates.RETURN_TO_INITIAL
+            }
+        }
+
+        if (this._attackState === AttackStates.RETURN_TO_INITIAL) {
+            // IF we make it back to our initial position, whether it's to the right or to the left
+            if (
+                (this.velocity.x > 0 && this.fighter.x >= this.initialXPosition)
+                || (this.velocity.x < 0 && this.fighter.x <= this.initialXPosition)
+            ) {
+                this.velocity.x = 0
+                this.fighter.x = this.initialXPosition
+                this.fighterToAttack = null
+
+                this._attackState = AttackStates.NOT_ATTACKING
+                this.application.transitionState(new PlayerSelectActionState(this.application))
+            }
+        }
+    }
+
+    inputJump = () => {
+        if (
+            !(this.application.state instanceof PlayerAttackingState) ||
+            this.attackState !== AttackStates.JUMPING
+            ) return
+            
+            if (this.isCollidingWithTopColliderOf(this.fighterToAttack)) {
+                this.velocity.x = 0
+                this.fighter.x = this.fighterToAttack.fighter.x
+                this.velocity.y = -10
+                this._attackState = AttackStates.DOUBLE_JUMP
+                this.application.transitionState(new PlayerAttackCompleteState(this.application, true))
+            } else {
+                this.application.transitionState(new PlayerAttackCompleteState(this.application, false))
+            }
+        }
 
     /**
      * Checks if the fighter is colliding with the ground.
@@ -228,34 +258,6 @@ export class Fighter {
         // Ergo, a higher Y value means the body is below the ground
         return bottomOfFighterBody >= topOfGround;
     };
-
-    attack = (fighterToAttack: Fighter) => {
-        this.fighterToAttack = fighterToAttack
-        this._attackState = AttackStates.MOVING_TO_ATTACK
-        
-        // advance toward the enemy, whether it be to the left or right
-        // This velocity should only be set once, or else the fighter will get faster!
-        if (this.fighter.x < this.fighterToAttack.fighter.x) {
-            this.velocity.x = 5
-        } else this.velocity.x = -5
-    }
-
-    inputJump = () => {
-        if (
-            !(this.application.state instanceof PlayerAttackingState) ||
-            this.attackState !== AttackStates.JUMPING
-        ) return
-
-        if (this.isCollidingWithTopColliderOf(this.fighterToAttack)) {
-            this.velocity.x = 0
-            this.fighter.x = this.fighterToAttack.fighter.x
-            this.velocity.y = -10
-            this._attackState = AttackStates.DOUBLE_JUMP
-            this.application.transitionState(new PlayerAttackCompleteState(this.application, true))
-        } else {
-            this.application.transitionState(new PlayerAttackCompleteState(this.application, false))
-        }
-    }
 
     isWithinDistanceOf = (fighterToAttack: Fighter): boolean => {
         if (this.velocity.x > 0) {
